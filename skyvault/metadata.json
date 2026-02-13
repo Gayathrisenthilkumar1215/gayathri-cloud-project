@@ -1,0 +1,5 @@
+{
+  "name": "SkyVault",
+  "description": "A modern, frontend-only cloud storage simulation featuring a glassmorphism login, intuitive dashboard, and functional file upload simulation.",
+  "requestFramePermissions": []
+}

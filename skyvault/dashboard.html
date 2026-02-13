@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyVault | Magical Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-pink: #FFD1DC;
+            --bg-blue: #B3E5FC;
+            --bg-lavender: #E1BEE7;
+            --pastel-primary: #FF9AA2;
+            --pastel-secondary: #B5EAD7;
+            --pastel-accent: #C7CEEA;
+            --text-main: #6D5D6E;
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Urbanist', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(-45deg, var(--bg-pink), var(--bg-blue), var(--bg-lavender), #FFF9C4);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-main);
+        }
+
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .sparkles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 50px 50px; opacity: 0.3; }
+
+        .container { width: 100%; max-width: 1000px; z-index: 10; }
+
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .brand h1 { font-size: 36px; font-weight: 800; background: linear-gradient(to right, #FF9AA2, #B5EAD7, #C7CEEA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand p { font-size: 16px; font-weight: 500; opacity: 0.8; }
+
+        .glass-box {
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 2px solid var(--glass-border); border-radius: 40px; padding: 35px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.03); margin-bottom: 30px;
+        }
+
+        /* Storage Usage Section */
+        .storage-wrapper { margin-bottom: 30px; }
+        .storage-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .storage-bar-container { width: 100%; height: 14px; background: rgba(255,255,255,0.3); border-radius: 50px; overflow: hidden; }
+        .storage-bar-fill { height: 100%; width: 0%; background: linear-gradient(to right, #FF9AA2, #C7CEEA); border-radius: 50px; transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* Upload Zone */
+        #dropZone {
+            border: 3px dashed var(--pastel-primary); border-radius: 30px; padding: 40px;
+            text-align: center; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.2);
+            position: relative; overflow: hidden;
+        }
+        #dropZone:hover, #dropZone.dragover { background: rgba(255,255,255,0.5); transform: translateY(-3px); border-color: var(--pastel-accent); }
+        #dropZone i { font-size: 45px; color: var(--pastel-primary); margin-bottom: 10px; }
+        #dropZone p { font-weight: 800; font-size: 18px; }
+
+        /* Controls Section */
+        .controls { display: flex; gap: 15px; margin-bottom: 25px; align-items: center; }
+        .search-container { flex: 1; position: relative; }
+        .search-container i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #A0939F; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border-radius: 50px; border: 2px solid var(--glass-border); background: var(--glass-bg); outline: none; font-weight: 600; color: var(--text-main); transition: 0.3s; }
+        .search-input:focus { border-color: var(--pastel-primary); background: #fff; box-shadow: 0 0 15px rgba(255,209,220,0.4); }
+        
+        .sort-select { padding: 15px 25px; border-radius: 50px; border: 2px solid var(--glass-border); background: var(--glass-bg); outline: none; font-weight: 700; color: var(--text-main); cursor: pointer; transition: 0.3s; appearance: none; -webkit-appearance: none; }
+        .sort-select:hover { border-color: var(--pastel-primary); }
+
+        /* File Cards */
+        .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .file-card {
+            background: rgba(255,255,255,0.7); border-radius: 25px; padding: 20px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.02); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            animation: cardIn 0.5s ease-out; position: relative;
+        }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .file-card:hover { transform: scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.05); border: 1px solid var(--pastel-primary); }
+
+        .f-icon-circle { width: 55px; height: 55px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .icon-image { background: #FFD1DC; color: #FF9AA2; }
+        .icon-doc { background: #B3E5FC; color: #4FC3F7; }
+        .icon-video { background: #E1BEE7; color: #BA68C8; }
+        .icon-music { background: #E2F0CB; color: #A8D5BA; }
+        .icon-other { background: #FFF9C4; color: #FBC02D; }
+
+        .f-info { flex: 1; overflow: hidden; }
+        .f-name { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+        .f-meta { font-size: 12px; font-weight: 700; color: #A0939F; display: flex; gap: 8px; }
+
+        .f-actions { display: flex; gap: 8px; }
+        .action-btn { width: 35px; height: 35px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; border: none; font-size: 14px; }
+        .btn-open { background: var(--pastel-secondary); color: #4CAF50; }
+        .btn-open:hover { transform: scale(1.1); background: #96e0c6; }
+        .btn-del { background: #FFD1DC; color: #FF8A8A; }
+        .btn-del:hover { transform: scale(1.1); background: #ffbacd; }
+
+        /* Logout Button */
+        .logout-btn { padding: 12px 25px; border-radius: 50px; background: #fff; border: 2px solid var(--glass-border); font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .logout-btn:hover { background: #FFD1DC; border-color: #FFB7B2; transform: translateY(-2px); }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px;
+            background: linear-gradient(135deg, #FF9AA2, #C7CEEA); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; color: white;
+            font-size: 28px; cursor: pointer; box-shadow: 0 10px 30px rgba(255, 154, 162, 0.4);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100;
+        }
+        .fab:hover { transform: rotate(90deg) scale(1.1); box-shadow: 0 15px 40px rgba(255, 154, 162, 0.6); }
+        .fab-label { position: absolute; right: 85px; background: white; padding: 10px 20px; border-radius: 20px; font-weight: 800; font-size: 14px; opacity: 0; pointer-events: none; transition: 0.3s; white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .fab:hover .fab-label { opacity: 1; transform: translateX(-10px); }
+
+    </style>
+</head>
+<body>
+    <div class="sparkles"></div>
+    
+    <div class="container">
+        <header>
+            <div class="brand">
+                <h1>SkyVault Dashboard</h1>
+                <p>Your files, beautifully organized.</p>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fa-solid fa-power-off"></i> Logout
+            </button>
+        </header>
+
+        <div class="glass-box">
+            <div class="storage-wrapper">
+                <div class="storage-header">
+                    <span>Vault Utilization</span>
+                    <span id="storageText">0 MB / 500 MB</span>
+                </div>
+                <div class="storage-bar-container">
+                    <div id="storageFill" class="storage-bar-fill"></div>
+                </div>
+            </div>
+
+            <div id="dropZone">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <p>Click or Drag Artifacts to the Vault</p>
+                <input type="file" id="fileInput" style="display:none" multiple>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Locate artifact by name...">
+            </div>
+            <select id="sortSelect" class="sort-select">
+                <option value="recent">Sort: Recent</option>
+                <option value="name">Sort: Name A-Z</option>
+                <option value="size">Sort: Size</option>
+            </select>
+        </div>
+
+        <div class="file-grid" id="fileGrid">
+            <!-- Dynamic Files -->
+        </div>
+    </div>
+
+    <!-- Floating Quick Upload -->
+    <div class="fab" onclick="document.getElementById('fileInput').click()">
+        <i class="fa-solid fa-plus"></i>
+        <div class="fab-label">Upload New Artifact</div>
+    </div>
+
+    <script>
+        const fileGrid = document.getElementById('fileGrid');
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect');
+        const storageText = document.getElementById('storageText');
+        const storageFill = document.getElementById('storageFill');
+
+        const STORAGE_LIMIT = 500 * 1024 * 1024; // 500 MB limit simulation
+        let files = JSON.parse(localStorage.getItem('skyvault_enhanced_files') || '[]');
+
+        function getFileIcon(name) {
+            const ext = name.split('.').pop().toLowerCase();
+            if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) return { icon: 'fa-image', class: 'icon-image' };
+            if (['mp4', 'mov', 'avi'].includes(ext)) return { icon: 'fa-video', class: 'icon-video' };
+            if (['mp3', 'wav', 'ogg'].includes(ext)) return { icon: 'fa-music', class: 'icon-music' };
+            if (['pdf', 'doc', 'docx', 'txt'].includes(ext)) return { icon: 'fa-file-lines', class: 'icon-doc' };
+            return { icon: 'fa-file', class: 'icon-other' };
+        }
+
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function updateUI() {
+            let filteredFiles = files.filter(f => f.name.toLowerCase().includes(searchInput.value.toLowerCase()));
+            
+            // Sorting Logic
+            const sortMode = sortSelect.value;
+            if (sortMode === 'name') filteredFiles.sort((a,b) => a.name.localeCompare(b.name));
+            else if (sortMode === 'size') filteredFiles.sort((a,b) => b.sizeInBytes - a.sizeInBytes);
+            else if (sortMode === 'recent') filteredFiles.sort((a,b) => b.timestamp - a.timestamp);
+
+            fileGrid.innerHTML = '';
+            
+            if (filteredFiles.length === 0) {
+                fileGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; opacity: 0.5;">
+                        <i class="fa-solid fa-inbox" style="font-size: 50px; margin-bottom: 15px;"></i>
+                        <p style="font-weight: 800;">No artifacts detected in this frequency.</p>
+                    </div>
+                `;
+            }
+
+            filteredFiles.forEach(file => {
+                const style = getFileIcon(file.name);
+                const card = document.createElement('div');
+                card.className = 'file-card';
+                card.innerHTML = `
+                    <div class="f-icon-circle ${style.class}">
+                        <i class="fa-solid ${style.icon}"></i>
+                    </div>
+                    <div class="f-info">
+                        <div class="f-name" title="${file.name}">${file.name}</div>
+                        <div class="f-meta">
+                            <span>${file.size}</span>
+                            <span>•</span>
+                            <span>${file.date}</span>
+                        </div>
+                    </div>
+                    <div class="f-actions">
+                        <button class="action-btn btn-open" onclick="alert('Artifact Preview Protocol initiated... [DEMO MODE]')">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                        <button class="action-btn btn-del" onclick="deleteFile('${file.id}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                fileGrid.appendChild(card);
+            });
+
+            // Update Storage Bar
+            const totalBytes = files.reduce((acc, curr) => acc + curr.sizeInBytes, 0);
+            const usagePercent = Math.min((totalBytes / STORAGE_LIMIT) * 100, 100);
+            storageFill.style.width = usagePercent + '%';
+            storageText.innerText = `${formatSize(totalBytes)} / 500 MB`;
+        }
+
+        function handleFiles(newFiles) {
+            for (let f of newFiles) {
+                const fileObj = {
+                    id: Date.now() + Math.random().toString(36).substr(2, 9),
+                    name: f.name,
+                    size: formatSize(f.size),
+                    sizeInBytes: f.size,
+                    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    timestamp: Date.now()
+                };
+                files.unshift(fileObj);
+            }
+            localStorage.setItem('skyvault_enhanced_files', JSON.stringify(files));
+            updateUI();
+        }
+
+        function deleteFile(id) {
+            if (confirm("De-materialize this artifact?")) {
+                files = files.filter(f => f.id !== id);
+                localStorage.setItem('skyvault_enhanced_files', JSON.stringify(files));
+                updateUI();
+            }
+        }
+
+        function logout() {
+            if (confirm("Terminate SkyVault session?")) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Event Listeners
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        searchInput.addEventListener('input', updateUI);
+        sortSelect.addEventListener('change', updateUI);
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => {
+            dropZone.addEventListener(eName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eName => {
+            dropZone.addEventListener(eName, () => dropZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eName => {
+            dropZone.addEventListener(eName, () => dropZone.classList.remove('dragover'), false);
+        });
+
+        dropZone.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files));
+
+        // Initial Boot
+        updateUI();
+    </script>
+</body>
+</html>

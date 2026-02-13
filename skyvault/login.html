@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyVault | Dreamy Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-pink: #FFD1DC;
+            --bg-blue: #B3E5FC;
+            --bg-lavender: #E1BEE7;
+            --pastel-primary: #FF9AA2;
+            --text-main: #6D5D6E;
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Urbanist', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(-45deg, var(--bg-pink), var(--bg-blue), var(--bg-lavender), #FFF9C4);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+        }
+
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .sparkles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+            background-image: radial-gradient(circle, #fff 1px, transparent 1px);
+            background-size: 50px 50px; animation: glitter 4s infinite linear; opacity: 0.3;
+        }
+        @keyframes glitter { 0% { transform: translateY(0); } 100% { transform: translateY(-50px); } }
+
+        .login-card {
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 2px solid var(--glass-border); border-radius: 40px; padding: 50px 40px;
+            width: 100%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            text-align: center; z-index: 10;
+            animation: cardIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes cardIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        h1 { font-size: 42px; font-weight: 800; background: linear-gradient(to right, #FF9AA2, #B5EAD7, #C7CEEA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        p.subtitle { color: var(--text-main); opacity: 0.8; font-weight: 500; margin-bottom: 30px; }
+
+        .input-field {
+            width: 100%; padding: 16px 25px; background: rgba(255,255,255,0.6); border: 2px solid transparent;
+            border-radius: 50px; outline: none; margin-bottom: 20px; color: var(--text-main); font-weight: 600;
+            transition: 0.3s;
+        }
+        .input-field:focus { background: #fff; border-color: #FFD1DC; box-shadow: 0 0 15px rgba(255,209,220,0.5); transform: translateY(-2px); }
+
+        .btn-submit {
+            width: 100%; padding: 18px; background: linear-gradient(45deg, #FFB7B2, #E2F0CB, #B2E2F2);
+            background-size: 200% 200%; border: none; border-radius: 50px; color: var(--text-main);
+            font-size: 18px; font-weight: 800; cursor: pointer; transition: 0.4s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 10px 20px rgba(255,183,178,0.3);
+        }
+        .btn-submit:hover { transform: scale(1.05); background-position: right center; box-shadow: 0 15px 25px rgba(255,183,178,0.5); }
+
+        #errorBox { color: #FF8A8A; font-size: 13px; font-weight: 700; margin-bottom: 15px; display: none; animation: shake 0.3s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    </style>
+</head>
+<body>
+    <div class="sparkles"></div>
+    <div class="login-card">
+        <i class="fa-solid fa-cloud" style="font-size: 55px; color: #FF9AA2; margin-bottom: 15px; filter: drop-shadow(0 5px 10px rgba(255,154,162,0.3))"></i>
+        <h1>SkyVault</h1>
+        <p class="subtitle">Your universe, beautifully secured.</p>
+        <form id="loginForm">
+            <input type="email" id="email" class="input-field" placeholder="Email Address" required>
+            <input type="password" id="password" class="input-field" placeholder="Password" required>
+            <div id="errorBox">Invalid email or password.</div>
+            <button type="submit" class="btn-submit">Enter Vault <i class="fa-solid fa-arrow-right-long"></i></button>
+        </form>
+    </div>
+    <script>
+        const VALID_EMAIL = "senthilgayu7092@gmail.com";
+        const VALID_PASS = "123456";
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const errorBox = document.getElementById('errorBox');
+            const btn = document.querySelector('.btn-submit');
+
+            if (email === VALID_EMAIL && pass === VALID_PASS) {
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 800);
+            } else {
+                errorBox.style.display = 'block';
+                setTimeout(() => errorBox.style.display = 'none', 3000);
+            }
+        });
+    </script>
+</body>
+</html>
